@@ -3,7 +3,6 @@ import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 import sqlite3
-import pysqlite3
 
 ModuleNotFoundError: No module named 'pysqlite3'
 import streamlit as st
