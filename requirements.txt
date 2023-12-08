@@ -78,8 +78,7 @@ pydeck==0.8.1b0
 Pygments==2.17.0
 pypdf==3.17.1
 PyPDF2==3.0.1
-PyPika==0.48.9
-pysqlite3==0.5.2 
+PyPika==0.48.9 
 python-dateutil==2.8.2
 python-decouple==3.8
 python-dotenv==1.0.0
