@@ -2,29 +2,27 @@ import streamlit as st
 
 st.set_page_config(
     page_title="ANOTE Financial Chatbot",
-    page_icon="👮‍♂️",
+    page_icon="images/anote_ai_logo.png",
 )
-st.header( "ANOTE Financial Chatbot :speech_balloon:")
+st.header("ANOTE Financial Chatbot :speech_balloon:")
+st.subheader("Welcome to ANOTE!")
+st.success("This is our Private GPT. We aim to help data teams within the finance sector to answer questions on documents such as 10-Ks.\n\n Come chat about your documents while keeping your data private and secure. ")
+st.info("You can select between either of the available options: ")
 
 # Create three columns 
 col1, col2 = st.columns([1,1])
 
 with col1:
-    st.image('images/covid-icon.png')
-    st.write('<a href="/covid"> Check out my Covid Dashboard</a>', unsafe_allow_html=True)
-    
-    #st.markdown ('[![Foo](http://www.google.com.au/images/nav_logo7.png)](http://google.com.au/)')
-    link_to_covid_page = ''
+    img = st.image('images/apichat.png')
+    st.markdown('<a href="/EdgarAPIChatbot"></a>', unsafe_allow_html=True)
+    st.warning("Specify the ticker of a company to ask questions based on the 10K of the company.")
 
-    #st.markdown('See my covid dashboard here.')
-
-    st.image('images/friends.png')
-    st.write('<a href="https://www.behance.net/datatime">View more pretty data visualizations.</a>', unsafe_allow_html=True)
 
 
 with col2:
-    st.image('images/covid-map.png')
-    st.write('<a href="/map"> Check out my Interactive Map</a>', unsafe_allow_html=True)    
-    
-    st.image('images/github.png')
-    st.write('<a href="https://github.com/zd123"> View more awesome code on my github.</a>', unsafe_allow_html=True)
+    st.image('images/pdfchat.png')
+    st.markdown('<a href="/PDFChatbot"></a>', unsafe_allow_html=True)
+    st.warning("Specify the ticker of a company to ask questions based on the 10K of the company.")
+
+
+st.info("You may navigate to either dashboard from the left sidebar.")

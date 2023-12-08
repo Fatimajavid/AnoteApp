@@ -12,7 +12,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import Chroma
 from langchain.chains.question_answering import load_qa_chain
-from decouple import config
+# from decouple import config
 # from langchain.memory import ConversationBufferWindowMemory
 
 import json
@@ -23,6 +23,10 @@ import time
 from openai import OpenAI
 from tempfile import NamedTemporaryFile
 
+st.set_page_config(
+    page_title="ANOTE Financial Chatbot",
+    page_icon="images/anote_ai_logo.png",
+)
 
 # Set up OpenAI API
 load_dotenv()
@@ -39,7 +43,6 @@ def process_file(uploaded_file):
 
     st.success(f"File processed successfully.")
     return temp_file_path
-
 
 def ask_gpt_finetuned_model(path_to_10k, question):
     db, db_dir = create_knowledge_hub(path_to_10k)
@@ -110,7 +113,7 @@ def create_knowledge_hub(path_to_10k):
 def delete_chroma_db(db_directory):
     try:
         shutil.rmtree(db_directory)
-        #print(f"Chroma database '{db_directory}' deleted successfully.")
+        print(f"Chroma database '{db_directory}' deleted successfully.")
     except FileNotFoundError:
         print(f"Chroma database '{db_directory}' not found.")
     except Exception as e:
@@ -154,7 +157,7 @@ def fill_json(path_to_json, path_to_10k, question, answer):
 def main():
 
     st.header( "ANOTE Financial Chatbot :speech_balloon:")
-    st.subheader("Hello! Please upload a pdf of your 10k document(s) so that I can assist you!")
+    st.info("Hello! I am ANOTE's AI Assistant. Please upload a pdf of your 10k document so that I can assist you!")
 
     # File Uploader for PDFs
     uploaded_files = st.file_uploader("Upload 10-K PDFs", type="pdf", accept_multiple_files=True)
@@ -176,9 +179,18 @@ def main():
     if "pdfmessages" not in st.session_state:
         st.session_state.pdfmessages = []
 
+    assistant_avatar = "images/anote_ai_logo.png"
+
     for message in st.session_state.pdfmessages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        # with st.chat_message(message["role"]):
+        #     st.markdown(message["content"])
+        if message["role"] == "user":
+            with st.chat_message("user"):
+                st.markdown(message["content"])
+        elif message["role"] == "assistant":
+            with st.chat_message("assistant", avatar=assistant_avatar):
+                st.markdown(message["content"])
+
 
     if prompt := st.chat_input("Hello! How can I help you today?"):
         if not uploaded:
@@ -189,7 +201,7 @@ def main():
                 st.markdown(prompt)
 
             # Display assistant response in chat message container
-            with st.chat_message("assistant"):
+            with st.chat_message("assistant", avatar=assistant_avatar):
                 message_placeholder = st.empty()
                 full_response = ""
                 

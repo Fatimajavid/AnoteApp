@@ -11,7 +11,7 @@ import datetime
 import shutil
 import time
 
-"""Module for fetching data from the SEC EDGAR Archives"""
+# """Module for fetching data from the SEC EDGAR Archives"""
 import json
 import os
 import re
@@ -24,6 +24,11 @@ if sys.version_info < (3, 8):
     from typing_extensions import Final
 else:
     from typing import Final
+
+st.set_page_config(
+    page_title="ANOTE Financial Chatbot",
+    page_icon="images/anote_ai_logo.png",
+)
 
 # Set up OpenAI API
 load_dotenv()
@@ -50,7 +55,7 @@ def get_filing(
     # """Fetches the specified filing from the SEC EDGAR Archives. Conforms to the rate
     # limits specified on the SEC website.
     # ref: https://www.sec.gov/os/accessing-edgar-data"""
-    print('1. get_filing')
+    # print('1. get_filing')
     session = _get_session(company, email)
     return _get_filing(session, cik, accession_number)
 
@@ -60,7 +65,7 @@ def get_filing(
 def _get_filing(
     session: requests.Session, cik: Union[str, int], accession_number: Union[str, int]
 ) -> str:
-    print('2. _get_filing')
+    # print('2. _get_filing')
     # """Wrapped so filings can be retrieved with an existing session."""
     url = archive_url(cik, accession_number)
     response = session.get(url)
@@ -73,7 +78,7 @@ def _get_filing(
 def get_cik_by_ticker(session: requests.Session, ticker: str) -> str:
     # """Gets a CIK number from a stock ticker by running a search on the SEC website."""
     cik_re = re.compile(r".*CIK=(\d{10}).*")
-    print('3. get_cik_by_ticker')
+    # print('3. get_cik_by_ticker')
     url = _search_url(ticker)
     response = session.get(url, stream=True)
     response.raise_for_status()
@@ -85,7 +90,7 @@ def get_cik_by_ticker(session: requests.Session, ticker: str) -> str:
 @limits(calls=10, period=1)
 def get_forms_by_cik(session: requests.Session, cik: Union[str, int]) -> dict:
     # """Gets retrieves dict of recent SEC form filings for a given cik number."""
-    print('4. get_forms_by_cik')
+    # print('4. get_forms_by_cik')
     json_name = f"CIK{cik}.json"
     response = session.get(f"{SEC_SUBMISSIONS_URL}/{json_name}")
     response.raise_for_status()
@@ -100,7 +105,7 @@ def _get_recent_acc_num_by_cik(
 ) -> Tuple[str, str]:
     # """Returns accession number and form type for the most recent filing for one of the
     # given form_types (AKA filing types) for a given cik."""
-    print('5. _get_recent_acc_num_by_cik')
+    # print('5. _get_recent_acc_num_by_cik')
     retrieved_form_types = get_forms_by_cik(session, cik)
     for acc_num, form_type_ in retrieved_form_types.items():
         if form_type_ in form_types:
@@ -117,7 +122,7 @@ def get_recent_acc_by_cik(
     """Returns (accession_number, retrieved_form_type) for the given cik and form_type.
     The retrieved_form_type may be an amended version of requested form_type, e.g. 10-Q/A for 10-Q.
     """
-    print('6. get_recent_acc_by_cik')
+    # print('6. get_recent_acc_by_cik')
     session = _get_session(company, email)
     return _get_recent_acc_num_by_cik(session, cik, _form_types(form_type))
 
@@ -128,10 +133,10 @@ def get_recent_cik_and_acc_by_ticker(
     company: Optional[str] = None,
     email: Optional[str] = None,
 ) -> Tuple[str, str, str]:
-    """Returns (cik, accession_number, retrieved_form_type) for the given ticker and form_type.
-    The retrieved_form_type may be an amended version of requested form_type, e.g. 10-Q/A for 10-Q.
-    """
-    print('7. get_recent_cik_and_acc_by_ticker')
+    # """Returns (cik, accession_number, retrieved_form_type) for the given ticker and form_type.
+    # The retrieved_form_type may be an amended version of requested form_type, e.g. 10-Q/A for 10-Q.
+    # """
+    # print('7. get_recent_cik_and_acc_by_ticker')
     session = _get_session(company, email)
     cik = get_cik_by_ticker(session, ticker)
     acc_num, retrieved_form_type = _get_recent_acc_num_by_cik(session, cik, _form_types(form_type))
@@ -145,8 +150,8 @@ def get_form_by_ticker(
     company: Optional[str] = None,
     email: Optional[str] = None,
 ) -> str:
-    """For a given ticker, gets the most recent form of a given form_type."""
-    print('8. get_form_by_ticker')
+    # """For a given ticker, gets the most recent form of a given form_type."""
+    # print('8. get_form_by_ticker')
     session = _get_session(company, email)
     cik = get_cik_by_ticker(session, ticker)
     return get_form_by_cik(
@@ -155,10 +160,10 @@ def get_form_by_ticker(
 
 
 def _form_types(form_type: str, allow_amended_filing: Optional[bool] = True):
-    """Potentialy expand to include amended filing, e.g.:
-    "10-Q" -> "10-Q/A"
-    """
-    print('9. _form_types')
+    # """Potentialy expand to include amended filing, e.g.:
+    # "10-Q" -> "10-Q/A"
+    # """
+    # print('9. _form_types')
     assert form_type in VALID_FILING_TYPES
     if allow_amended_filing and not form_type.endswith("/A"):
         return [form_type, f"{form_type}/A"]
@@ -173,11 +178,11 @@ def get_form_by_cik(
     company: Optional[str] = None,
     email: Optional[str] = None,
 ) -> str:
-    """For a given CIK, returns the most recent form of a given form_type. By default
-    an amended version of the form_type may be retrieved (allow_amended_filing=True).
-    E.g., if form_type is "10-Q", the retrived form could be a 10-Q or 10-Q/A.
-    """
-    print('10. get_form_by_cik')
+    # """For a given CIK, returns the most recent form of a given form_type. By default
+    # an amended version of the form_type may be retrieved (allow_amended_filing=True).
+    # E.g., if form_type is "10-Q", the retrived form could be a 10-Q or 10-Q/A.
+    # """
+    # print('10. get_form_by_cik')
     session = _get_session(company, email)
     acc_num, _ = _get_recent_acc_num_by_cik(
         session, cik, _form_types(form_type, allow_amended_filing)
@@ -187,9 +192,9 @@ def get_form_by_cik(
 
 
 def open_form(cik, acc_num):
-    """For a given cik and accession number, opens the index page in default browser for the
-    associated SEC form"""
-    print('11. open_form')
+    # """For a given cik and accession number, opens the index page in default browser for the
+    # associated SEC form"""
+    # print('11. open_form')
     acc_num = _drop_dashes(acc_num)
     webbrowser.open_new_tab(f"{SEC_ARCHIVE_URL}/{cik}/{acc_num}/{_add_dashes(acc_num)}-index.html")
 
@@ -201,9 +206,9 @@ def open_form_by_ticker(
     company: Optional[str] = None,
     email: Optional[str] = None,
 ):
-    """For a given ticker, opens the index page in default browser for the most recent form of a
-    given form_type."""
-    print('12. open_form_by_ticker')
+    # """For a given ticker, opens the index page in default browser for the most recent form of a
+    # given form_type."""
+    # print('12. open_form_by_ticker')
     session = _get_session(company, email)
     cik = get_cik_by_ticker(session, ticker)
     acc_num, _ = _get_recent_acc_num_by_cik(
@@ -213,23 +218,23 @@ def open_form_by_ticker(
 
 
 def archive_url(cik: Union[str, int], accession_number: Union[str, int]) -> str:
-    """Builds the archive URL for the SEC accession number. Looks for the .txt file for the
-    filing, while follows a {accession_number}.txt format."""
-    print('13. archive_url')
+    # """Builds the archive URL for the SEC accession number. Looks for the .txt file for the
+    # filing, while follows a {accession_number}.txt format."""
+    # print('13. archive_url')
     filename = f"{_add_dashes(accession_number)}.txt"
     accession_number = _drop_dashes(accession_number)
     return f"{SEC_ARCHIVE_URL}/{cik}/{accession_number}/{filename}"
 
 
 def _search_url(cik: Union[str, int]) -> str:
-    print('14. _search_url')
+    # print('14. _search_url')
     search_string = f"CIK={cik}&Find=Search&owner=exclude&action=getcompany"
     url = f"{SEC_SEARCH_URL}?{search_string}"
     return url
 
 
 def _add_dashes(accession_number: Union[str, int]) -> str:
-    print('15._add_dashes')
+    # print('15._add_dashes')
     # """Adds the dashes back into the accession number"""
     accession_number = str(accession_number)
     return f"{accession_number[:10]}-{accession_number[10:12]}-{accession_number[12:]}"
@@ -237,7 +242,7 @@ def _add_dashes(accession_number: Union[str, int]) -> str:
 
 def _drop_dashes(accession_number: Union[str, int]) -> str:
     # """Converts the accession number to the no dash representation."""
-    print('16. _drop_dashes')
+    # print('16. _drop_dashes')
     accession_number = str(accession_number).replace("-", "")
     return accession_number.zfill(18)
 
@@ -246,8 +251,7 @@ def _get_session(company: Optional[str] = None, email: Optional[str] = None) -> 
     # """Creates a requests sessions with the appropriate headers set. If these headers are not
     # set, SEC will reject your request.
     # ref: https://www.sec.gov/os/accessing-edgar-data"""
-
-    print('17. _get_session')
+    # print('17. _get_session')
 
     if company is None:
         company = os.environ.get("SEC_API_ORGANIZATION")
@@ -296,7 +300,7 @@ def create_knowledge_hub(plaintext):
     return vectordb, db_directory
 
 def delete_chroma_db(db_directory):
-    print('delete_chroma_db')
+    # print('delete_chroma_db')
     try:
         shutil.rmtree(db_directory)
         #print(f"Chroma database '{db_directory}' deleted successfully.")
@@ -306,7 +310,7 @@ def delete_chroma_db(db_directory):
         print(f"Error deleting Chroma database: {str(e)}")
 
 def ask_gpt_finetuned_model(ticker, question):
-    print('ask_gpt_finetuned_model')
+    # print('ask_gpt_finetuned_model')
     try:
         text = get_form_by_ticker(ticker, '10-K', company='Unstructured Technologies', email='support@unstructured.io')
     except Exception as e:
@@ -337,9 +341,11 @@ def ask_gpt_finetuned_model(ticker, question):
 
 def main():
 
-    st.header( "ANOTE Financial Chatbot :speech_balloon:")
+    st.header("ANOTE Financial Chatbot :speech_balloon:")
+    st.info("Hello! I am ANOTE's AI Assistant. Enter a ticker to ask a question about a company's 10K.")
+    st.warning("Note: This chatbot uses data from the U.S. Securities and Exchange Commission's (SEC) EDGAR (Electronic Data Gathering, Analysis, and Retrieval) system, which provides access to publicly available corporate filings.")
     
-    ticker = st.text_input("Enter Ticker:")
+    ticker = st.text_input("Enter ticker:")
     if ticker :
         st.success(f"Now you may ask a question based on {ticker}.")
     
@@ -353,9 +359,15 @@ def main():
     if "apimessages" not in st.session_state:
         st.session_state.apimessages = []
 
+    assistant_avatar = "images/anote_ai_logo.png"
+
     for message in st.session_state.apimessages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        if message["role"] == "user":
+            with st.chat_message("user"):
+                st.markdown(message["content"])
+        elif message["role"] == "assistant":
+            with st.chat_message("assistant", avatar=assistant_avatar):
+                st.markdown(message["content"])
 
     if prompt := st.chat_input("Hello! How can I help you today?"):
         if not ticker:
@@ -366,7 +378,7 @@ def main():
                 st.markdown(prompt)
 
             # Display assistant response in chat message container
-            with st.chat_message("assistant"):
+            with st.chat_message("assistant", avatar=assistant_avatar):
                 message_placeholder = st.empty()
                 full_response = ""
                 
