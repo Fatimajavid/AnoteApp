@@ -1,8 +1,3 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
-import sqlite3
 import streamlit as st
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.llms import OpenAI
@@ -275,12 +270,12 @@ def _get_session(company: Optional[str] = None, email: Optional[str] = None) -> 
 
 def process_and_embed_xml(text):
     cleaned_text = re.sub('<[^>]+>', '', text)
-    print('18. process_and_embed_xml')
+    # print('18. process_and_embed_xml')
 
     return cleaned_text
 
 def create_knowledge_hub(plaintext):
-    print('create_knowledge_hub')
+    # print('create_knowledge_hub')
     now = datetime.datetime.now()
     timestamp = now.strftime("%Y%m%d%H%M%S")
     db_directory = "db_" + timestamp
