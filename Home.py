@@ -1,11 +1,11 @@
 # Importing pysqlite3 and replacing the sqlite3 module
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 
 # Import other necessary modules
 import streamlit as st
-import sqlite3
+# import sqlite3
 
 st.set_page_config(
     page_title="ANOTE Financial Chatbot",
